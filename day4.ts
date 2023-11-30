@@ -1,6 +1,6 @@
 import { readFile } from './helpers'
 
-function turnsToWin(board: number[][]): number[] {
+function turnsToWin(board: number[][]): { count: number; unmarkedSum: number } {
   //calculate the amount of turns to win for this board
   const captured: boolean[][] = Array.from({ length: 5 }, () => Array.from({ length: 5 }, () => false));
   var count: number = 0;
@@ -19,7 +19,8 @@ function turnsToWin(board: number[][]): number[] {
       //for each row
       if (captured[i].every((value) => value)) {
         //every value is true in this row
-        return [count, calculateSum(board, captured)];
+        const unmarkedSum: number = calculateSum(board, captured);
+        return { count, unmarkedSum };
       }
     }
 
@@ -34,7 +35,8 @@ function turnsToWin(board: number[][]): number[] {
         }
       }
       if (colTrue) {
-        return [count, calculateSum(board, captured)];
+        const unmarkedSum: number = calculateSum(board, captured);
+        return { count, unmarkedSum };
       }
     }
   }
@@ -75,16 +77,17 @@ for (let i = 0; i < rows.length; i += 5) {
 
 // play game for each board, calculate the amount of moves it takes
 // and also the sum of all unmarked values at win state
-const winCounts: number[][] = boards.map((board) => turnsToWin(board));
-var minVal: number[] = winCounts[0];
+const winCounts: { count: number; unmarkedSum: number }[] = boards.map((board) => turnsToWin(board));
+var minVal = winCounts[0];
+console.log(winCounts)
 
 for (let i = 0; i < winCounts.length; i++) {
   //determine which board needed least amount of moves
-  if (winCounts[i][0] < minVal[0]) {
+  if (winCounts[i].count < minVal.count) {
     minVal = winCounts[i];
   }
 }
 
 
 //calculate the final answer
-console.log("Score: " + minVal[1] * moves[minVal[0] - 1]);
+console.log("Score: " + minVal.unmarkedSum * moves[minVal.count - 1]);
